@@ -8,78 +8,34 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
-#include <sstream>
 
 
 using namespace std;
-/*
-template<typename Key>
-class element_not_found : public exception {
-	Key key;
-	static ostringstream cnvt;
 
+template<typename Key>
+class element_not_found : public exception { //Exception class for the case where an element with the specified key is not found
+	Key key;
 public:
-	element_not_found(const Key& _key) : exception("Not found the given key"), key(_key) {}
+	element_not_found(const Key& _key) : key(_key) {} //Default constructor
 
 	virtual const char* what() const throw() {
-		cnvt.str("");
-		cnvt << exception::what() << ": " << getKey();
-		return cnvt.str().c_str();
-
+		cerr << getKey() << ": ";
+		return "Given key not found in the tree";
 	}
-
 	const Key& getKey() const {
 		return key;
 	}
-
 };
 
-template<typename Key>
-ostringstream element_not_found<typename Key>::cnvt;
-
-*/
-
-template<typename Key>
-class element_not_found : public exception {
-	Key key;
-	static ostringstream cnvt;
-
+class zero_pointer : public exception { //Exception class for the case where
+	static ostringstream cnvt2;
 public:
-	element_not_found(const Key& _key) : exception("Not found the given key"), key(_key) {}
-
+	zero_pointer() {} //Default constructor
 	virtual const char* what() const throw() {
-		cnvt.str("");
-		cnvt << "Not found the given key: " << getKey();
-		return cnvt.str().c_str();
+		return "Zero pointer";
 	}
-
-	const Key& getKey() const {
-		return key;
-	}
-
 };
 
-template<typename Key>
-ostringstream element_not_found<typename Key>::cnvt;
-
-
-
-
-class zero_pointer : public exception {
-	static ostringstream cnvt;
-
-public:
-	zero_pointer() : exception("Zero pointer"){}
-
-	virtual const char* what() const throw() {
-		cnvt.str("");
-		cnvt << exception::what();
-		return cnvt.str().c_str();
-
-	}
-
-};
-ostringstream zero_pointer::cnvt;
 
 
 template<typename Key, typename Info>
@@ -110,7 +66,8 @@ class Dictionary {
 	int balanceFactorAux(Node* subtree) const {
 		if (!subtree)
 			throw zero_pointer();
-		return height(subtree->right) - height(subtree->left);
+		else
+			return height(subtree->right) - height(subtree->left);
 	}
 
 	void findBalanceFactor(Node* subtree) {
@@ -290,11 +247,11 @@ public:
 	void remove(const Key& _key) {
 		try {
 			if (!exists(_key))
-				throw exception();
+				throw element_not_found<Key>(_key);
 			root = removeRecur(root, _key);
 		}
-		catch (exception& e) {
-			std::cerr << "exception caught: " << e.what() << '\n';
+		catch (const element_not_found<Key>& e) {
+			std::cerr << e.what() << endl;
 		}
 	}
 
@@ -320,6 +277,7 @@ public:
 			throw exception();
 		}
 	}
+
 
 };
 
